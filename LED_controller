@@ -1,0 +1,194 @@
+// Button pin definitions
+const int buttonPin = 2;  
+int buttonState = LOW;  
+
+// LED pin definitions
+const int led1Pin = 6;
+const int led2Pin = 9;
+const int led3Pin = 10;
+const int led4Pin = 11;
+
+// Controller definitions
+int currentMode = 0;      // Variable to track the current mode
+
+// Speed parameter definitions
+int pulseDelay = 75;   // Initial delay between LED steps
+int waveDelay = 300;  // Initial delay between LED steps
+int acceleration = 3; // Speed acceleration factor for pulseAccel
+int accelerationStep = 5; // Speed acceleration factor for waveAccel
+
+// Pin setup code for the button and LEDs
+void setup() 
+{
+  pinMode(buttonPin, INPUT);
+  pinMode(led1Pin, OUTPUT);
+  pinMode(led2Pin, OUTPUT);
+  pinMode(led3Pin, OUTPUT);
+  pinMode(led4Pin, OUTPUT); 
+  Serial.begin(9600);
+}
+
+// Function to switch to the next mode
+void switchMode() 
+{
+  currentMode = (currentMode + 1) % 9;  // Cycling through modes (0 to 8)
+  Serial.print("Switching to Mode ");
+  Serial.println(currentMode);
+}
+
+void loop() 
+{
+  int reading = digitalRead(buttonPin);
+
+  if (reading != buttonState)
+  { 
+    { 
+      buttonState = reading;
+
+      if (buttonState == LOW) 
+      {
+        // Toggle switchMode
+        switchMode();
+      }
+    }
+  }
+
+  // Call the corresponding function based on the current mode
+  switch (currentMode) 
+  {
+    case 0:
+      off();
+      break;
+    case 1:
+      on();
+      break;
+    case 2:
+      blink();
+      break;
+    case 3:
+      altBlink();
+      break;
+    case 4:
+      pulseAccel();
+      break;
+    case 5:
+      waveAccel();
+      break;
+    case 6:
+      flickerRandom();
+      break;
+    case 7:
+      flicker();
+      break;
+    case 8:
+      twinkle();
+      break;
+  }
+}
+
+// Functions for each mode
+void off() 
+{ 
+  // Turn all LEDs off
+  digitalWrite(led1Pin, LOW);
+  digitalWrite(led2Pin, LOW);
+  digitalWrite(led3Pin, LOW);
+  digitalWrite(led4Pin, LOW);
+}
+
+void on() 
+{  
+  // Turn all LEDs on
+  digitalWrite(led1Pin, HIGH);
+  digitalWrite(led2Pin, HIGH);
+  digitalWrite(led3Pin, HIGH);
+  digitalWrite(led4Pin, HIGH); 
+}
+
+void blink() 
+{
+  // Turn all LEDs on
+  digitalWrite(led1Pin, HIGH);
+  digitalWrite(led2Pin, HIGH);
+  digitalWrite(led3Pin, HIGH);
+  digitalWrite(led4Pin, HIGH);
+  delay(1000);
+
+  // Turn all LEDs off
+  digitalWrite(led1Pin, LOW);
+  digitalWrite(led2Pin, LOW);
+  digitalWrite(led3Pin, LOW);
+  digitalWrite(led4Pin, LOW);
+  delay(1000);
+}
+
+void altBlink()
+{ 
+  // Turn LEDs 1 and 3 on
+  digitalWrite(led1Pin, HIGH);
+  digitalWrite(led2Pin, LOW);
+  digitalWrite(led3Pin, HIGH);
+  digitalWrite(led4Pin, LOW);
+  delay(1000);
+
+  // Turn LEDs 2 and 4 on
+  digitalWrite(led1Pin, LOW);
+  digitalWrite(led2Pin, HIGH);
+  digitalWrite(led3Pin, LOW);
+  digitalWrite(led4Pin, HIGH);
+  delay(1000);
+}
+
+void pulseAccel()
+{
+  int stepDelay = pulseDelay;
+  
+  for (int brightness = 5; brightness <= 255; brightness += 10) 
+  {
+    analogWrite(led1Pin, brightness);
+    analogWrite(led2Pin, brightness);
+    analogWrite(led3Pin, brightness);
+    analogWrite(led4Pin, brightness);
+    delay(stepDelay);
+
+    // Accelerate the speed
+    stepDelay -= acceleration;
+  }   
+}
+
+void waveAccel()
+{
+  for (int brightness = 0; brightness <= 255; brightness += 60) 
+  {
+    analogWrite(led1Pin, brightness);
+    delay(waveDelay);
+
+    // Accelerate the speed before the next LED
+    waveDelay = int(waveDelay * 0.7);
+
+    analogWrite(led2Pin, brightness * accelerationStep);
+    delay(waveDelay);
+
+    // Accelerate the speed before the next LED
+    waveDelay = int(waveDelay * 0.8);
+
+    analogWrite(led3Pin, brightness * accelerationStep);
+    delay(waveDelay);
+
+    // Accelerate the speed before the next LED
+    waveDelay = int(waveDelay * 0.9);
+
+    analogWrite(led4Pin, brightness * accelerationStep);
+    delay(waveDelay);
+
+    // Accelerate the speed before the next LED
+    waveDelay = int(waveDelay * 0.9);
+  }
+}
+
+void flickerRandom() 
+{
+  for (int i = 0; i < 100; i++) {  
+    int flickerValue1 = random(256);  
+    int flickerValue2 = random(256);  
+    int flickerValue3 = random(256
